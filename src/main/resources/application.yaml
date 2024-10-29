@@ -2,11 +2,25 @@ spring:
   application:
     name: edge-service
   profiles:
-    group:
-      local: [local]
-      prod: [prod]
+    active: local
   config:
-    import: "optional:configserver:"
+    import: "configserver:"
   cloud:
     config:
       uri: http://localhost:8888
+      request-connect-timeout: 5000
+      request-read-timeout: 5000
+      # 배포환경에서는 true로 변경
+      fail-fast: false
+      retry:
+        max-attempts: 6
+        initial-interval: 1000
+        max-interval: 2000
+        multiplier: 1.1
+
+#actuator 활성화
+management:
+  endpoints:
+    web:
+      exposure:
+        include: refresh
