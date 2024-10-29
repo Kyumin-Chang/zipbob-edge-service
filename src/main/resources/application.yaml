@@ -1,0 +1,12 @@
+spring:
+  application:
+    name: edge-service
+  profiles:
+    group:
+      local: [local]
+      prod: [prod]
+  config:
+    import: "optional:configserver:"
+  cloud:
+    config:
+      uri: http://localhost:8888
