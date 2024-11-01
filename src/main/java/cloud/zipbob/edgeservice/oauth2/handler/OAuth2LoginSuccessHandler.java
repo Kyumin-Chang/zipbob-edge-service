@@ -2,6 +2,7 @@ package cloud.zipbob.edgeservice.oauth2.handler;
 
 import cloud.zipbob.edgeservice.auth.PrincipalDetails;
 import cloud.zipbob.edgeservice.auth.dto.TokenDto;
+import cloud.zipbob.edgeservice.auth.jwt.JwtTokenProperties;
 import cloud.zipbob.edgeservice.auth.jwt.JwtTokenProvider;
 import cloud.zipbob.edgeservice.domain.member.Member;
 import cloud.zipbob.edgeservice.domain.member.Role;
@@ -29,6 +30,7 @@ import java.util.Objects;
 @RequiredArgsConstructor
 public class OAuth2LoginSuccessHandler implements AuthenticationSuccessHandler {
     private final JwtTokenProvider jwtTokenProvider;
+    private final JwtTokenProperties jwtTokenProperties;
     private final MemberRepository memberRepository;
     private final RedisService redisService;
 
@@ -55,7 +57,7 @@ public class OAuth2LoginSuccessHandler implements AuthenticationSuccessHandler {
         jwtTokenProvider.accessTokenSetHeader(accessToken, response);
         jwtTokenProvider.refreshTokenSetHeader(refreshToken, response);
 
-        long refreshTokenExpirationPeriod = jwtTokenProvider.getRefreshTokenExpirationPeriod();
+        long refreshTokenExpirationPeriod = jwtTokenProperties.getRefreshExpiration();
         redisService.setValues(member.getEmail(), refreshToken, Duration.ofMillis(refreshTokenExpirationPeriod));
 
         Map<String, String> jsonResponse = new HashMap<>();

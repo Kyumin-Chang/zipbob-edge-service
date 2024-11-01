@@ -14,29 +14,35 @@ import org.junit.jupiter.api.Test;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
+import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.util.ReflectionTestUtils;
 
 import java.security.Key;
 import java.util.Date;
 
 import static org.junit.jupiter.api.Assertions.*;
+import static org.mockito.Mockito.when;
 
+@ActiveProfiles("test")
 class JwtTokenProviderTest {
 
     @InjectMocks
     private JwtTokenProvider jwtTokenProvider;
 
     @Mock
-    private PrincipalDetails principalDetails;
+    private JwtTokenProperties jwtTokenProperties;
 
     private Key key;
 
     @BeforeEach
     void setUp() {
         MockitoAnnotations.openMocks(this);
-        jwtTokenProvider = new JwtTokenProvider();
-        String secretKey = "test-secret-key-that-is-long-enough-very-very-very-long-key";
-        ReflectionTestUtils.setField(jwtTokenProvider, "secretKey", secretKey);
+
+        when(jwtTokenProperties.getSecretKey()).thenReturn("test-secret-key-that-is-long-enough-very-very-very-long-key");
+        when(jwtTokenProperties.getAccessExpiration()).thenReturn(3600000L);  // 1시간
+        when(jwtTokenProperties.getRefreshExpiration()).thenReturn(1209600000L);  // 2주
+
+        jwtTokenProvider = new JwtTokenProvider(jwtTokenProperties);
         jwtTokenProvider.init();
         key = (Key) ReflectionTestUtils.getField(jwtTokenProvider, "key");
     }
@@ -66,7 +72,7 @@ class JwtTokenProviderTest {
         // given
         String token = Jwts.builder()
                 .setSubject("test@example.com")
-                .setExpiration(new Date(System.currentTimeMillis() + 60000))
+                .setExpiration(new Date(System.currentTimeMillis() + 60000)) // 1분
                 .signWith(key)
                 .compact();
 
@@ -83,7 +89,7 @@ class JwtTokenProviderTest {
         // given
         String token = Jwts.builder()
                 .setSubject("test@example.com")
-                .setExpiration(new Date(System.currentTimeMillis() - 60000))
+                .setExpiration(new Date(System.currentTimeMillis() - 60000)) // 1분 전 만료
                 .signWith(key)
                 .compact();
 

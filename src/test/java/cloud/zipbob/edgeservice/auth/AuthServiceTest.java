@@ -3,6 +3,7 @@ package cloud.zipbob.edgeservice.auth;
 import cloud.zipbob.edgeservice.auth.dto.TokenDto;
 import cloud.zipbob.edgeservice.auth.exception.TokenException;
 import cloud.zipbob.edgeservice.auth.exception.TokenExceptionType;
+import cloud.zipbob.edgeservice.auth.jwt.JwtTokenProperties;
 import cloud.zipbob.edgeservice.auth.jwt.JwtTokenProvider;
 import cloud.zipbob.edgeservice.domain.member.Member;
 import cloud.zipbob.edgeservice.domain.member.Role;
@@ -32,6 +33,9 @@ class AuthServiceTest {
 
     @Mock
     private JwtTokenProvider jwtTokenProvider;
+
+    @Mock
+    private JwtTokenProperties jwtTokenProperties;
 
     @Mock
     private RedisService redisService;
@@ -107,7 +111,7 @@ class AuthServiceTest {
         when(redisService.getValues(email)).thenReturn(refreshToken);
         when(redisService.checkExistsValue(refreshToken)).thenReturn(true);
         long expirationMillis = 3600000L;
-        when(jwtTokenProvider.getAccessTokenExpirationPeriod()).thenReturn(expirationMillis);
+        when(jwtTokenProperties.getAccessExpiration()).thenReturn(expirationMillis);
 
         // when
         authService.logout(refreshToken, accessToken);

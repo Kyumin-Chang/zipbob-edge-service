@@ -80,13 +80,15 @@ public class CustomOAuth2MemberService extends DefaultOAuth2UserService {
     private static final SecureRandom random = new SecureRandom();
 
     public static String getRandomPassword(int length) {
-        return Stream.of(
-                        getRandomCharacter(NUMBER_CHARACTERS),
-                        getRandomCharacter(UPPERCASE_CHARACTERS),
-                        getRandomCharacter(LOWERCASE_CHARACTERS),
-                        getRandomCharacter(SPECIAL_SYMBOL_CHARACTERS),
-                        getRandomCharacters(length - 4)
-                ).flatMap(Stream::of)
+        return Stream.concat(
+                        Stream.of(
+                                getRandomCharacter(NUMBER_CHARACTERS),
+                                getRandomCharacter(UPPERCASE_CHARACTERS),
+                                getRandomCharacter(LOWERCASE_CHARACTERS),
+                                getRandomCharacter(SPECIAL_SYMBOL_CHARACTERS)
+                        ),
+                        Stream.of(getRandomCharacters(length - 4)).flatMap(Stream::of)
+                )
                 .collect(Collectors.collectingAndThen(Collectors.toList(), collected -> {
                     Collections.shuffle(collected);
                     return collected.stream();
@@ -100,8 +102,8 @@ public class CustomOAuth2MemberService extends DefaultOAuth2UserService {
     }
 
     private static String[] getRandomCharacters(int count) {
-        return random.ints(count, 0, CustomOAuth2MemberService.ALL_CHARACTERS.length())
-                .mapToObj(CustomOAuth2MemberService.ALL_CHARACTERS::charAt)
+        return random.ints(count, 0, ALL_CHARACTERS.length())
+                .mapToObj(ALL_CHARACTERS::charAt)
                 .map(String::valueOf)
                 .toArray(String[]::new);
     }

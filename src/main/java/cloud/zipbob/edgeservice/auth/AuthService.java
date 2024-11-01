@@ -3,6 +3,7 @@ package cloud.zipbob.edgeservice.auth;
 import cloud.zipbob.edgeservice.auth.dto.TokenDto;
 import cloud.zipbob.edgeservice.auth.exception.TokenException;
 import cloud.zipbob.edgeservice.auth.exception.TokenExceptionType;
+import cloud.zipbob.edgeservice.auth.jwt.JwtTokenProperties;
 import cloud.zipbob.edgeservice.auth.jwt.JwtTokenProvider;
 import cloud.zipbob.edgeservice.domain.member.Member;
 import cloud.zipbob.edgeservice.domain.member.exception.MemberException;
@@ -23,6 +24,7 @@ import java.time.Duration;
 @RequiredArgsConstructor
 public class AuthService {
     private final JwtTokenProvider jwtTokenProvider;
+    private final JwtTokenProperties jwtTokenProperties;
     private final RedisService redisService;
     private final MemberRepository memberRepository;
 
@@ -49,7 +51,7 @@ public class AuthService {
         if (redisService.checkExistsValue(redisRefreshToken)) {
             redisService.deleteValues(email);
             // 로그아웃 시 Access Token Redis 저장 ( key = Access Token / value = "logout" ) 로그아웃 후 해당 액세스 토큰 사용 불가
-            long accessTokenExpirationMillis = jwtTokenProvider.getAccessTokenExpirationPeriod();
+            long accessTokenExpirationMillis = jwtTokenProperties.getAccessExpiration();
             redisService.setValues(accessToken, "logout", Duration.ofMillis(accessTokenExpirationMillis));
         } else {
             throw new TokenException(TokenExceptionType.TOKEN_INVALID);

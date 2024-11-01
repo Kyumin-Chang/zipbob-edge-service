@@ -11,9 +11,8 @@ import io.jsonwebtoken.security.Keys;
 import jakarta.annotation.PostConstruct;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
-import lombok.Getter;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.cloud.context.config.annotation.RefreshScope;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
@@ -27,26 +26,19 @@ import java.util.Date;
 
 @Slf4j
 @Component
-@RefreshScope
+@RequiredArgsConstructor
 public class JwtTokenProvider {
+    private final JwtTokenProperties jwtTokenProperties;
     private static final String BEARER = "Bearer";
     private static final String AUTHORIZATION_HEADER = "Authorization";
     private static final String REFRESH_TOKEN_HEADER = "Refresh";
     private static final String BEARER_PREFIX = "Bearer ";
-    //TODO 비밀키 환경변수 처리 (현재는 임시값)
-    private final String secretKey = "test-secret-key-that-is-long-enough-very-very-very-long-key";
-
-    @Getter
-    private final long accessTokenExpirationPeriod = 3600000; // 1시간
-
-    @Getter
-    private final long refreshTokenExpirationPeriod = 1209600000; // 2주
 
     private Key key;
 
     @PostConstruct
     public void init() {
-        String base64EncodedSecretKey = encodeBase64SecretKey(this.secretKey);
+        String base64EncodedSecretKey = encodeBase64SecretKey(jwtTokenProperties.getSecretKey());
         this.key = getKeyFromBase64EncodeKey(base64EncodedSecretKey);
     }
 
@@ -62,8 +54,9 @@ public class JwtTokenProvider {
     public TokenDto generateTokenDto(PrincipalDetails principalDetails) {
         log.info("GenerateTokenDto execute principalDetails : {} {}",
                 principalDetails.getUsername(), principalDetails.getAuthorities());
-        Date accessTokenExpirationDate = getTokenExpiration(accessTokenExpirationPeriod);
-        Date refreshTokenExpirationDate = getTokenExpiration(refreshTokenExpirationPeriod);
+        log.info("expiration period : {}", jwtTokenProperties.getAccessExpiration());
+        Date accessTokenExpirationDate = getTokenExpiration(jwtTokenProperties.getAccessExpiration());
+        Date refreshTokenExpirationDate = getTokenExpiration(jwtTokenProperties.getRefreshExpiration());
         String role = principalDetails.getAuthorities().iterator().next().getAuthority();
 
         String accessToken = Jwts.builder()
