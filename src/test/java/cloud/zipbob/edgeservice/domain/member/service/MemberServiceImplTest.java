@@ -7,9 +7,11 @@ import cloud.zipbob.edgeservice.domain.member.exception.MemberExceptionType;
 import cloud.zipbob.edgeservice.domain.member.repository.MemberRepository;
 import cloud.zipbob.edgeservice.domain.member.request.MemberUpdateRequest;
 import cloud.zipbob.edgeservice.domain.member.request.MemberWithdrawRequest;
+import cloud.zipbob.edgeservice.domain.member.request.OAuth2JoinRequest;
 import cloud.zipbob.edgeservice.domain.member.response.MemberUpdateResponse;
 import cloud.zipbob.edgeservice.domain.member.response.MemberWithdrawResponse;
 import cloud.zipbob.edgeservice.domain.member.response.MyInfoResponse;
+import cloud.zipbob.edgeservice.domain.member.response.OAuth2JoinResponse;
 import cloud.zipbob.edgeservice.oauth2.SocialType;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -204,6 +206,33 @@ class MemberServiceImplTest {
 
         // then
         assertFalse(result);
+        verify(memberRepository, times(1)).findByNickname(anyString());
+    }
+
+    @Test
+    @DisplayName("oauth2join 호출 시 멤버의 역할이 GUEST에서 USER로 변경되는지 확인")
+    void oauth2Join_ShouldChangeRoleFromGuestToUser_WhenCalled() {
+        // given
+        String email = "test@example.com";
+        Member guestMember = Member.builder()
+                .email(email)
+                .nickname(null) // Assuming nickname is null initially
+                .role(Role.GUEST)
+                .socialType(SocialType.GOOGLE)
+                .build();
+        OAuth2JoinRequest request = new OAuth2JoinRequest("NewNickname");
+
+        when(memberRepository.findByEmail(anyString())).thenReturn(Optional.of(guestMember));
+        when(memberRepository.findByNickname(anyString())).thenReturn(Optional.empty());
+
+        // when
+        OAuth2JoinResponse response = memberService.oauth2Join(request, email);
+
+        // then
+        assertEquals("NewNickname", guestMember.getNickname());
+        assertEquals(Role.USER, guestMember.getRole());
+        assertEquals(Role.USER, response.getRole());
+        verify(memberRepository, times(1)).findByEmail(anyString());
         verify(memberRepository, times(1)).findByNickname(anyString());
     }
 }

@@ -3,9 +3,11 @@ package cloud.zipbob.edgeservice.api;
 import cloud.zipbob.edgeservice.auth.PrincipalDetails;
 import cloud.zipbob.edgeservice.domain.member.request.MemberUpdateRequest;
 import cloud.zipbob.edgeservice.domain.member.request.MemberWithdrawRequest;
+import cloud.zipbob.edgeservice.domain.member.request.OAuth2JoinRequest;
 import cloud.zipbob.edgeservice.domain.member.response.MemberUpdateResponse;
 import cloud.zipbob.edgeservice.domain.member.response.MemberWithdrawResponse;
 import cloud.zipbob.edgeservice.domain.member.response.MyInfoResponse;
+import cloud.zipbob.edgeservice.domain.member.response.OAuth2JoinResponse;
 import cloud.zipbob.edgeservice.domain.member.service.MemberService;
 import cloud.zipbob.edgeservice.global.Responder;
 import lombok.RequiredArgsConstructor;
@@ -26,6 +28,13 @@ public class MemberController {
     public ResponseEntity<MemberUpdateResponse> update(@AuthenticationPrincipal PrincipalDetails user,
                                                        @RequestBody final MemberUpdateRequest request) {
         MemberUpdateResponse response = memberService.update(request, user.getUsername());
+        return Responder.success(response);
+    }
+
+    @PatchMapping("/oauth2/join")
+    @PreAuthorize("hasAnyAuthority('ROLE_GUEST')")
+    public ResponseEntity<OAuth2JoinResponse> join(@AuthenticationPrincipal PrincipalDetails user, @RequestBody final OAuth2JoinRequest request) {
+        OAuth2JoinResponse response = memberService.oauth2Join(request, user.getUsername());
         return Responder.success(response);
     }
 
