@@ -1,6 +1,9 @@
 package cloud.zipbob.edgeservice.config;
 
+import cloud.zipbob.edgeservice.auth.filter.JwtVerificationFilter;
+import cloud.zipbob.edgeservice.auth.jwt.JwtTokenProvider;
 import cloud.zipbob.edgeservice.global.CustomAccessDeniedHandler;
+import cloud.zipbob.edgeservice.global.redis.RedisService;
 import cloud.zipbob.edgeservice.oauth2.CustomOAuth2MemberService;
 import cloud.zipbob.edgeservice.oauth2.handler.OAuth2LoginFailureHandler;
 import cloud.zipbob.edgeservice.oauth2.handler.OAuth2LoginSuccessHandler;
@@ -14,6 +17,7 @@ import org.springframework.security.config.annotation.web.configurers.AbstractHt
 import org.springframework.security.config.annotation.web.configurers.HeadersConfigurer;
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.web.SecurityFilterChain;
+import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.CorsConfigurationSource;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
@@ -30,6 +34,8 @@ public class SecurityConfig {
     private final OAuth2LoginSuccessHandler oAuth2LoginSuccessHandler;
     private final OAuth2LoginFailureHandler oAuth2LoginFailureHandler;
     private final CustomOAuth2MemberService customOAuth2MemberService;
+    private final JwtTokenProvider jwtTokenProvider;
+    private final RedisService redisService;
 
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
@@ -57,6 +63,8 @@ public class SecurityConfig {
                 )
                 .logout(logout -> logout.deleteCookies("JSESSIONID")
                         .logoutUrl("/auth/logout"));
+        
+        http.addFilterBefore(new JwtVerificationFilter(jwtTokenProvider, redisService), UsernamePasswordAuthenticationFilter.class);
 
         return http.build();
     }
@@ -64,7 +72,7 @@ public class SecurityConfig {
     @Bean
     CorsConfigurationSource corsConfigurationSource() {
         CorsConfiguration configuration = new CorsConfiguration();
-        configuration.setAllowedOrigins(List.of("http://localhost:3000"));
+        configuration.setAllowedOrigins(List.of("*"));
         configuration.setAllowedMethods(Arrays.asList("GET", "POST", "PATCH", "DELETE", "OPTIONS"));
         configuration.setAllowCredentials(true);
         configuration.addExposedHeader("Authorization");

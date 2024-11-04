@@ -24,7 +24,7 @@ import java.util.List;
 @RequiredArgsConstructor
 public class JwtVerificationFilter extends OncePerRequestFilter {
     private static final List<String> EXCLUDED_PATHS =
-            List.of("/auth/reissue", "members/nickname-check");
+            List.of("/auth/reissue", "/members/nickname-check");
     private final JwtTokenProvider jwtTokenProvider;
     private final RedisService redisService;
     private static final ObjectMapper objectMapper = new ObjectMapper().registerModule(new JavaTimeModule());
