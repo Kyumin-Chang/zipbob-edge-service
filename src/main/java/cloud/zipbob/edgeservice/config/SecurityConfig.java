@@ -51,7 +51,8 @@ public class SecurityConfig {
                 .authorizeHttpRequests(authorizeRequests -> authorizeRequests
                         .requestMatchers("/auth/reissue",
                                 "members/nickname-check/**", "/swagger-ui/**",
-                                "/api-docs/**")
+                                "/api-docs/**", "/actuator/**")
+                        //TODO actuator 관련 수정
                         .permitAll()
                         .anyRequest().authenticated())
                 .oauth2Login((oauth2Login) ->
@@ -63,7 +64,7 @@ public class SecurityConfig {
                 )
                 .logout(logout -> logout.deleteCookies("JSESSIONID")
                         .logoutUrl("/auth/logout"));
-        
+
         http.addFilterBefore(new JwtVerificationFilter(jwtTokenProvider, redisService), UsernamePasswordAuthenticationFilter.class);
 
         return http.build();
