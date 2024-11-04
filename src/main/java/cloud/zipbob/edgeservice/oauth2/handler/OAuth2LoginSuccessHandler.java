@@ -63,8 +63,10 @@ public class OAuth2LoginSuccessHandler implements AuthenticationSuccessHandler {
         Map<String, String> jsonResponse = new HashMap<>();
         if (Objects.equals(role, Role.GUEST.getKey())) {
             jsonResponse.put("message", "New Member OAuth Login Success");
+            jsonResponse.put("email", member.getEmail());
         } else {
-            jsonResponse.put("message", "Existing Member OAuth Login Failure");
+            jsonResponse.put("message", "Existing Member OAuth Login Success");
+            jsonResponse.put("email", member.getEmail());
         }
         response.setContentType("application/json;charset=UTF-8");
         response.setStatus(HttpServletResponse.SC_OK);
