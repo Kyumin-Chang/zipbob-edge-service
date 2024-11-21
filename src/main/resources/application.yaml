@@ -5,6 +5,11 @@ spring:
     active: local
   config:
     import: "configserver:"
+  rabbitmq:
+    host: ${RABBITMQ_HOST}
+    port: ${RABBITMQ_PORT}
+    username: ${RABBITMQ_USERNAME}
+    password: ${RABBITMQ_PASSWORD}
   cloud:
     config:
       uri: http://localhost:8888
@@ -18,9 +23,8 @@ spring:
         max-interval: 2000
         multiplier: 1.1
 
-#actuator 활성화
 management:
   endpoints:
     web:
       exposure:
-        include: refresh
+        include: refresh, health, bus-refresh
