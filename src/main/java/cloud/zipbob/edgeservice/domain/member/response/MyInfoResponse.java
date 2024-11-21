@@ -7,10 +7,11 @@ import lombok.Getter;
 @Getter
 @AllArgsConstructor
 public class MyInfoResponse {
+    private Long id;
     private String email;
     private String nickname;
 
     public static MyInfoResponse of(Member member) {
-        return new MyInfoResponse(member.getEmail(), member.getNickname());
+        return new MyInfoResponse(member.getId(), member.getEmail(), member.getNickname());
     }
 }
