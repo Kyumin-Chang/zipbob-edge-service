@@ -103,6 +103,7 @@ class JwtTokenProviderTest {
     void getAuthentication_ShouldReturnAuthenticationFromToken() {
         // given
         Member member = Member.builder()
+                .id(1L)
                 .email("test@example.com")
                 .password("password")
                 .role(Role.USER)
