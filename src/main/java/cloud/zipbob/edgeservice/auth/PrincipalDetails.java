@@ -29,7 +29,8 @@ public class PrincipalDetails extends Member implements UserDetails, OAuth2User 
         this.attributes = attributes;
     }
 
-    private PrincipalDetails(String email, String role) {
+    private PrincipalDetails(Long memberId, String email, String role) {
+        this.id = memberId;
         this.email = email;
         this.role = role;
     }
@@ -48,8 +49,8 @@ public class PrincipalDetails extends Member implements UserDetails, OAuth2User 
         return new PrincipalDetails(member, attributes);
     }
 
-    public static PrincipalDetails of(String email, String role) {
-        return new PrincipalDetails(email, role);
+    public static PrincipalDetails of(Long memberId, String email, String role) {
+        return new PrincipalDetails(memberId, email, role);
     }
 
     @Override

@@ -79,7 +79,8 @@ public class JwtVerificationFilter extends OncePerRequestFilter {
     }
 
     @Override
-    protected boolean shouldNotFilter(HttpServletRequest request) throws ServletException {
+    protected boolean shouldNotFilter(HttpServletRequest request) {
+        log.info("Request URI excluded from JwtVerificationFilter");
         return EXCLUDED_PATHS.stream().anyMatch(exclude -> exclude.equalsIgnoreCase(request.getServletPath()));
     }
 

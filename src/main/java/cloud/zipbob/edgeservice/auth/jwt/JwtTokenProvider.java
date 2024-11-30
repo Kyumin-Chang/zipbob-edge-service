@@ -58,8 +58,10 @@ public class JwtTokenProvider {
         Date accessTokenExpirationDate = getTokenExpiration(jwtTokenProperties.getAccessExpiration());
         Date refreshTokenExpirationDate = getTokenExpiration(jwtTokenProperties.getRefreshExpiration());
         String role = principalDetails.getAuthorities().iterator().next().getAuthority();
+        Long memberId = principalDetails.getId();
 
         String accessToken = Jwts.builder()
+                .claim("memberId", memberId)
                 .claim("role", role)
                 .setSubject(principalDetails.getUsername())
                 .setExpiration(accessTokenExpirationDate)
@@ -89,14 +91,16 @@ public class JwtTokenProvider {
         log.info("getAuthentication execute accessToken: {}", accessToken);
         Claims claims = parseClaims(accessToken);
 
-        if (claims.get("role") == null) {
-            log.debug("getAuthentication exception execute : no role in accessToken : {}", accessToken);
+        if (claims.get("role") == null || claims.get("memberId") == null) {
+            log.debug("getAuthentication exception execute : no role or id in accessToken : {}", accessToken);
             throw new BadCredentialsException("Invalid access token");
         }
 
+        Integer memberIdNumber = (Integer) claims.get("memberId");
+        Long memberId = memberIdNumber.longValue();
         String authority = claims.get("role").toString();
         PrincipalDetails principalDetails = PrincipalDetails.of(
-                claims.getSubject(), authority);
+                memberId, claims.getSubject(), authority);
         log.info("getAuthentication Role check : {}",
                 principalDetails.getAuthorities().iterator().next().getAuthority());
         return new UsernamePasswordAuthenticationToken(principalDetails, null, principalDetails.getAuthorities());
