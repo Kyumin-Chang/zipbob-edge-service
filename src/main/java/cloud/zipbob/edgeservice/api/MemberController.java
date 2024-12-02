@@ -37,7 +37,7 @@ public class MemberController {
     @PreAuthorize("hasAnyAuthority('ROLE_GUEST')")
     public ResponseEntity<OAuth2JoinResponse> join(@AuthenticationPrincipal PrincipalDetails user, @RequestBody final OAuth2JoinRequest request) {
         OAuth2JoinResponse response = memberService.oauth2Join(request, user.getUsername());
-        emailService.sendEmail(user.getUsername(), request.nickname(), "welcome");
+        emailService.sendEmailRequest(user.getUsername(), request.nickname(), "welcome");
         return Responder.success(response);
     }
 
@@ -46,7 +46,7 @@ public class MemberController {
     public ResponseEntity<MemberWithdrawResponse> withdraw(@AuthenticationPrincipal PrincipalDetails user,
                                                            @RequestBody final MemberWithdrawRequest request) {
         MemberWithdrawResponse response = memberService.withdraw(request, user.getUsername());
-        emailService.sendEmail(user.getUsername(), request.nickname(), "goodbye");
+        emailService.sendEmailRequest(user.getUsername(), request.nickname(), "goodbye");
         return Responder.success(response);
     }
 

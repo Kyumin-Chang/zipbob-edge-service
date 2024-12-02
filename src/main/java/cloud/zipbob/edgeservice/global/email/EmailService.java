@@ -1,9 +1,11 @@
 package cloud.zipbob.edgeservice.global.email;
 
+import cloud.zipbob.edgeservice.config.RabbitMQProperties;
 import jakarta.mail.MessagingException;
 import jakarta.mail.internet.MimeMessage;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.mail.javamail.MimeMessageHelper;
 import org.springframework.stereotype.Service;
@@ -18,6 +20,18 @@ import java.io.File;
 public class EmailService {
     private final JavaMailSender mailSender;
     private final TemplateEngine templateEngine;
+    private final RabbitTemplate rabbitTemplate;
+    private final RabbitMQProperties rabbitMQProperties;
+
+    public void sendEmailRequest(String receiver, String nickname, String type) {
+        EmailRequest emailRequest = new EmailRequest(receiver, nickname, type);
+        rabbitTemplate.convertAndSend(
+                rabbitMQProperties.getExchangeName(),
+                rabbitMQProperties.getRoutingKey(),
+                emailRequest
+        );
+        log.info("Email request sent to RabbitMQ: {}", emailRequest);
+    }
 
     public void sendEmail(String receiver, String nickname, String type) {
         try {
