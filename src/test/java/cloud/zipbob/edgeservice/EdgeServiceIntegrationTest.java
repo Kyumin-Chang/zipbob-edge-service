@@ -4,19 +4,18 @@ import cloud.zipbob.edgeservice.auth.PrincipalDetails;
 import cloud.zipbob.edgeservice.domain.member.Member;
 import cloud.zipbob.edgeservice.domain.member.Role;
 import cloud.zipbob.edgeservice.domain.member.repository.MemberRepository;
+import cloud.zipbob.edgeservice.global.email.EmailService;
 import cloud.zipbob.edgeservice.global.redis.RedisService;
 import cloud.zipbob.edgeservice.oauth2.SocialType;
 import cloud.zipbob.edgeservice.oauth2.handler.OAuth2LoginSuccessHandler;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.servlet.http.HttpServletRequest;
-import org.junit.jupiter.api.AfterAll;
-import org.junit.jupiter.api.BeforeAll;
-import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.TestInstance;
+import org.junit.jupiter.api.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.MediaType;
 import org.springframework.mock.web.MockHttpServletResponse;
 import org.springframework.security.core.Authentication;
@@ -29,8 +28,7 @@ import java.util.Map;
 import java.util.Objects;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.*;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.patch;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
@@ -56,9 +54,19 @@ public class EdgeServiceIntegrationTest {
     @Autowired
     private PasswordEncoder passwordEncoder;
 
+    @MockBean
+    private EmailService emailService;
+
     private String accessToken;
     private String refreshToken;
     private Member testMember;
+
+    @BeforeEach
+    public void setupMock() {
+        doNothing().when(emailService).sendEmail(org.mockito.ArgumentMatchers.anyString(),
+                org.mockito.ArgumentMatchers.anyString(),
+                org.mockito.ArgumentMatchers.anyString());
+    }
 
     @BeforeAll
     public void setup() throws Exception {
