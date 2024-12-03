@@ -10,6 +10,7 @@ import cloud.zipbob.edgeservice.domain.member.response.MyInfoResponse;
 import cloud.zipbob.edgeservice.domain.member.response.OAuth2JoinResponse;
 import cloud.zipbob.edgeservice.domain.member.service.MemberService;
 import cloud.zipbob.edgeservice.global.Responder;
+import cloud.zipbob.edgeservice.global.email.EmailService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -22,6 +23,7 @@ import org.springframework.web.bind.annotation.*;
 public class MemberController {
 
     private final MemberService memberService;
+    private final EmailService emailService;
 
     @PatchMapping("/update")
     @PreAuthorize("hasAnyAuthority('ROLE_USER', 'ROLE_ADMIN')")
@@ -35,6 +37,7 @@ public class MemberController {
     @PreAuthorize("hasAnyAuthority('ROLE_GUEST')")
     public ResponseEntity<OAuth2JoinResponse> join(@AuthenticationPrincipal PrincipalDetails user, @RequestBody final OAuth2JoinRequest request) {
         OAuth2JoinResponse response = memberService.oauth2Join(request, user.getUsername());
+        emailService.sendEmailRequest(user.getUsername(), request.nickname(), "welcome");
         return Responder.success(response);
     }
 
@@ -43,6 +46,7 @@ public class MemberController {
     public ResponseEntity<MemberWithdrawResponse> withdraw(@AuthenticationPrincipal PrincipalDetails user,
                                                            @RequestBody final MemberWithdrawRequest request) {
         MemberWithdrawResponse response = memberService.withdraw(request, user.getUsername());
+        emailService.sendEmailRequest(user.getUsername(), request.nickname(), "goodbye");
         return Responder.success(response);
     }
 
