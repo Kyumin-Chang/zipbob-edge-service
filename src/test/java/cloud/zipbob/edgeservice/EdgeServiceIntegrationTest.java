@@ -1,5 +1,13 @@
 package cloud.zipbob.edgeservice;
 
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.mockito.Mockito.doNothing;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.patch;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+
 import cloud.zipbob.edgeservice.auth.PrincipalDetails;
 import cloud.zipbob.edgeservice.domain.member.Member;
 import cloud.zipbob.edgeservice.domain.member.Role;
@@ -11,7 +19,14 @@ import cloud.zipbob.edgeservice.oauth2.handler.OAuth2LoginSuccessHandler;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.servlet.http.HttpServletRequest;
-import org.junit.jupiter.api.*;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Objects;
+import org.junit.jupiter.api.AfterAll;
+import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.TestInstance;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -21,23 +36,44 @@ import org.springframework.mock.web.MockHttpServletResponse;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.test.context.ActiveProfiles;
+import org.springframework.test.context.DynamicPropertyRegistry;
+import org.springframework.test.context.DynamicPropertySource;
 import org.springframework.test.web.servlet.MockMvc;
-
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Objects;
-
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.mockito.Mockito.*;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.patch;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+import org.testcontainers.containers.GenericContainer;
+import org.testcontainers.containers.MariaDBContainer;
+import org.testcontainers.junit.jupiter.Container;
+import org.testcontainers.junit.jupiter.Testcontainers;
 
 @ActiveProfiles("test")
 @SpringBootTest
+@Testcontainers
 @AutoConfigureMockMvc
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
 public class EdgeServiceIntegrationTest {
+    @Container
+    static final MariaDBContainer<?> mariaDBContainer = new MariaDBContainer<>("mariadb:latest")
+            .withDatabaseName("testdb")
+            .withUsername("testuser")
+            .withPassword("testpass");
+
+    @Container
+    static final GenericContainer<?> redisContainer = new GenericContainer<>("redis:latest")
+            .withExposedPorts(6379);
+
+    @DynamicPropertySource
+    static void configureTestContainers(DynamicPropertyRegistry registry) {
+        if (!mariaDBContainer.isRunning()) {
+            mariaDBContainer.start();
+        }
+        if (!redisContainer.isRunning()) {
+            redisContainer.start();
+        }
+        registry.add("spring.datasource.url", mariaDBContainer::getJdbcUrl);
+        registry.add("spring.datasource.username", mariaDBContainer::getUsername);
+        registry.add("spring.datasource.password", mariaDBContainer::getPassword);
+        registry.add("spring.data.redis.host", redisContainer::getHost);
+        registry.add("spring.data.redis.port", () -> redisContainer.getMappedPort(6379));
+    }
 
     @Autowired
     private MockMvc mockMvc;
