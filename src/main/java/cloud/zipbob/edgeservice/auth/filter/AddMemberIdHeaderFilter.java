@@ -16,7 +16,7 @@ import org.springframework.security.core.context.SecurityContextHolder;
 @Slf4j
 public class AddMemberIdHeaderFilter implements Filter {
 
-    private static final List<String> EXCLUDED_PATHS = List.of("/auth/reissue", "/members/nickname-check", "/",
+    private static final List<String> EXCLUDED_PATHS = List.of("/auth/reissue", "/members/nickname-check",
             "/members/test/join");
 
     @Override
@@ -48,6 +48,9 @@ public class AddMemberIdHeaderFilter implements Filter {
     }
 
     private boolean shouldNotFilter(String requestURI) {
+        if ("/".equals(requestURI)) {
+            return true;
+        }
         return EXCLUDED_PATHS.stream().anyMatch(requestURI::startsWith);
     }
 }
