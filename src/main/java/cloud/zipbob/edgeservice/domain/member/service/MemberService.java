@@ -16,7 +16,7 @@ public interface MemberService {
 
     MemberWithdrawResponse withdraw(MemberWithdrawRequest request, String email);
 
-    MyInfoResponse myInfo(String email);
+    MyInfoResponse getMyInfo(String email);
 
     boolean checkNickname(String nickname);
 

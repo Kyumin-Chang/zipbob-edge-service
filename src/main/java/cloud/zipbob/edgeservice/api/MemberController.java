@@ -1,7 +1,6 @@
 package cloud.zipbob.edgeservice.api;
 
 import cloud.zipbob.edgeservice.auth.PrincipalDetails;
-import cloud.zipbob.edgeservice.auth.jwt.JwtTokenProvider;
 import cloud.zipbob.edgeservice.domain.member.request.MemberUpdateRequest;
 import cloud.zipbob.edgeservice.domain.member.request.MemberWithdrawRequest;
 import cloud.zipbob.edgeservice.domain.member.request.OAuth2JoinRequest;
@@ -34,7 +33,6 @@ public class MemberController {
 
     private final MemberService memberService;
     private final EmailService emailService;
-    private final JwtTokenProvider jwtTokenProvider;
 
     @PatchMapping("/update")
     @PreAuthorize("hasAnyAuthority('ROLE_USER', 'ROLE_ADMIN')")
@@ -65,7 +63,7 @@ public class MemberController {
     @GetMapping("/myInfo")
     @PreAuthorize("hasAnyAuthority('ROLE_USER', 'ROLE_ADMIN')")
     public ResponseEntity<MyInfoResponse> myInfo(@AuthenticationPrincipal PrincipalDetails user) {
-        MyInfoResponse response = memberService.myInfo(user.getUsername());
+        MyInfoResponse response = memberService.getMyInfo(user.getUsername());
         return Responder.success(response);
     }
 
