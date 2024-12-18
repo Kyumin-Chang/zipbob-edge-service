@@ -174,7 +174,7 @@ public class EdgeServiceIntegrationTest {
         MockHttpServletResponse response = mockMvc.perform(patch("/members/update")
                         .header("Authorization", "Bearer " + accessToken)
                         .contentType(MediaType.APPLICATION_JSON)
-                        .content("{\"newNickname\": \"updatedUser\"}"))
+                        .content("{\"newNickname\": \"updatedUser2\"}"))
                 .andExpect(status().isOk())
                 .andReturn()
                 .getResponse();
@@ -189,7 +189,7 @@ public class EdgeServiceIntegrationTest {
         assertThat(jsonNode.get("email").asText()).isEqualTo("test@example.com");
 
         Member updatedMember = memberRepository.findByEmail("test@example.com").orElseThrow();
-        assertThat(updatedMember.getNickname()).isEqualTo("updatedUser");
+        assertThat(updatedMember.getNickname()).isEqualTo("updatedUser2");
     }
 
     @Test

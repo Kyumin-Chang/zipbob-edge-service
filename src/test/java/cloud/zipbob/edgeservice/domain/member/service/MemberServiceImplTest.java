@@ -1,5 +1,14 @@
 package cloud.zipbob.edgeservice.domain.member.service;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
+
 import cloud.zipbob.edgeservice.domain.member.Member;
 import cloud.zipbob.edgeservice.domain.member.Role;
 import cloud.zipbob.edgeservice.domain.member.exception.MemberException;
@@ -13,6 +22,7 @@ import cloud.zipbob.edgeservice.domain.member.response.MemberWithdrawResponse;
 import cloud.zipbob.edgeservice.domain.member.response.MyInfoResponse;
 import cloud.zipbob.edgeservice.domain.member.response.OAuth2JoinResponse;
 import cloud.zipbob.edgeservice.oauth2.SocialType;
+import java.util.Optional;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -22,12 +32,6 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
-
-import java.util.Optional;
-
-import static org.junit.jupiter.api.Assertions.*;
-import static org.mockito.ArgumentMatchers.anyString;
-import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
 class MemberServiceImplTest {
@@ -145,7 +149,7 @@ class MemberServiceImplTest {
         when(memberRepository.findByEmail(anyString())).thenReturn(Optional.of(member));
 
         // when
-        MyInfoResponse response = memberService.myInfo(email);
+        MyInfoResponse response = memberService.getMyInfo(email);
 
         // then
         assertEquals(member.getEmail(), response.getEmail());
@@ -163,7 +167,7 @@ class MemberServiceImplTest {
 
         // when & then
         MemberException exception = assertThrows(MemberException.class,
-                () -> memberService.myInfo(email));
+                () -> memberService.getMyInfo(email));
 
         assertEquals(MemberExceptionType.MEMBER_NOT_FOUND, exception.getExceptionType());
         verify(memberRepository, times(1)).findByEmail(anyString());

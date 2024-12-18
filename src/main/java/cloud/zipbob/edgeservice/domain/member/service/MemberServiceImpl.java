@@ -25,7 +25,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 @Service
-@Transactional
 @RequiredArgsConstructor
 // TODO 관리자 전용 api 제작하기 (멤버 삭제)
 public class MemberServiceImpl implements MemberService {
@@ -35,6 +34,7 @@ public class MemberServiceImpl implements MemberService {
     private final JwtTokenProperties jwtTokenProperties;
 
     @Override
+    @Transactional
     public MemberUpdateResponse update(MemberUpdateRequest request, String email) {
         Member member = memberRepository.findByEmail(email)
                 .orElseThrow(() -> new MemberException(MemberExceptionType.MEMBER_NOT_FOUND));
@@ -46,6 +46,7 @@ public class MemberServiceImpl implements MemberService {
     }
 
     @Override
+    @Transactional
     public OAuth2JoinResponse oauth2Join(OAuth2JoinRequest request, String email) {
         Member member = memberRepository.findByEmail(email)
                 .orElseThrow(() -> new MemberException(MemberExceptionType.MEMBER_NOT_FOUND));
@@ -58,6 +59,7 @@ public class MemberServiceImpl implements MemberService {
     }
 
     @Override
+    @Transactional
     public MemberWithdrawResponse withdraw(MemberWithdrawRequest request, String email) {
         Member member = memberRepository.findByEmail(email)
                 .orElseThrow(() -> new MemberException(MemberExceptionType.MEMBER_NOT_FOUND));
@@ -69,13 +71,15 @@ public class MemberServiceImpl implements MemberService {
     }
 
     @Override
-    public MyInfoResponse myInfo(String email) {
+    @Transactional(readOnly = true)
+    public MyInfoResponse getMyInfo(String email) {
         Member member = memberRepository.findByEmail(email)
                 .orElseThrow(() -> new MemberException(MemberExceptionType.MEMBER_NOT_FOUND));
         return MyInfoResponse.of(member);
     }
 
     @Override
+    @Transactional(readOnly = true)
     public boolean checkNickname(String nickname) {
         return memberRepository.findByNickname(nickname).isPresent();
     }
