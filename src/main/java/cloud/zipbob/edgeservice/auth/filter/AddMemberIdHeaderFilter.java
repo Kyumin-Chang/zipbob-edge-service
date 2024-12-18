@@ -16,7 +16,8 @@ import org.springframework.security.core.context.SecurityContextHolder;
 @Slf4j
 public class AddMemberIdHeaderFilter implements Filter {
 
-    private static final List<String> EXCLUDED_PATHS = List.of("/auth/reissue", "/members/nickname-check", "/");
+    private static final List<String> EXCLUDED_PATHS = List.of("/auth/reissue", "/members/nickname-check", "/",
+            "/members/test/join");
 
     @Override
     public void doFilter(jakarta.servlet.ServletRequest request,

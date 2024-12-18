@@ -49,7 +49,7 @@ public class SecurityConfig {
                         .accessDeniedHandler(customAccessDeniedHandler))
                 .authorizeHttpRequests(authorizeRequests -> authorizeRequests
                         .requestMatchers("/", "/auth/reissue",
-                                "members/nickname-check/**", "/actuator/**")
+                                "members/nickname-check/**", "/actuator/**", "/members/test/join")
                         .permitAll()
                         .anyRequest().authenticated())
                 .oauth2Login((oauth2Login) ->
