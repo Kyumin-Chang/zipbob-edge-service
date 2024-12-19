@@ -24,7 +24,7 @@ public class MemberController {
     private final EmailService emailService;
 
     @PatchMapping("/update")
-    @PreAuthorize("hasAnyAuthority('ROLE_USER', 'ROLE_ADMIN')")
+//    @PreAuthorize("hasAnyAuthority('ROLE_USER', 'ROLE_ADMIN')")
     public ResponseEntity<MemberUpdateResponse> update(@AuthenticationPrincipal PrincipalDetails user,
                                                        @RequestBody final MemberUpdateRequest request) {
         MemberUpdateResponse response = memberService.update(request, user.getUsername());
@@ -32,7 +32,7 @@ public class MemberController {
     }
 
     @PatchMapping("/oauth2/join")
-    @PreAuthorize("hasAnyAuthority('ROLE_GUEST')")
+//    @PreAuthorize("hasAnyAuthority('ROLE_GUEST')")
     public ResponseEntity<OAuth2JoinResponse> join(@AuthenticationPrincipal PrincipalDetails user,
                                                    @RequestBody final OAuth2JoinRequest request) {
         OAuth2JoinResponse response = memberService.oauth2Join(request, user.getUsername());
@@ -50,7 +50,7 @@ public class MemberController {
     }
 
     @GetMapping("/myInfo")
-    @PreAuthorize("hasAnyAuthority('ROLE_USER', 'ROLE_ADMIN')")
+//    @PreAuthorize("hasAnyAuthority('ROLE_USER', 'ROLE_ADMIN')")
     public ResponseEntity<MyInfoResponse> myInfo(@AuthenticationPrincipal PrincipalDetails user) {
         MyInfoResponse response = memberService.getMyInfo(user.getUsername());
         return Responder.success(response);
