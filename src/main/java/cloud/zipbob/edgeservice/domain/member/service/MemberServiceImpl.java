@@ -12,17 +12,14 @@ import cloud.zipbob.edgeservice.domain.member.repository.MemberRepository;
 import cloud.zipbob.edgeservice.domain.member.request.MemberUpdateRequest;
 import cloud.zipbob.edgeservice.domain.member.request.MemberWithdrawRequest;
 import cloud.zipbob.edgeservice.domain.member.request.OAuth2JoinRequest;
-import cloud.zipbob.edgeservice.domain.member.response.MemberUpdateResponse;
-import cloud.zipbob.edgeservice.domain.member.response.MemberWithdrawResponse;
-import cloud.zipbob.edgeservice.domain.member.response.MyInfoResponse;
-import cloud.zipbob.edgeservice.domain.member.response.OAuth2JoinResponse;
-import cloud.zipbob.edgeservice.domain.member.response.TestJoinResponse;
+import cloud.zipbob.edgeservice.domain.member.response.*;
 import cloud.zipbob.edgeservice.global.redis.RedisService;
 import cloud.zipbob.edgeservice.oauth2.SocialType;
-import java.time.Duration;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+
+import java.time.Duration;
 
 @Service
 @RequiredArgsConstructor
@@ -96,7 +93,7 @@ public class MemberServiceImpl implements MemberService {
                 .socialId("123456789")
                 .email(email)
                 .password(password)
-                .role(Role.GUEST)
+                .role(Role.USER)
                 .build();
         memberRepository.save(member);
         PrincipalDetails principalDetails = new PrincipalDetails(member);
