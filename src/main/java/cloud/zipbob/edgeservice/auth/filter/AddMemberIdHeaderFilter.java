@@ -7,11 +7,12 @@ import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
-import java.io.IOException;
-import java.util.List;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
+
+import java.io.IOException;
+import java.util.List;
 
 @Slf4j
 public class AddMemberIdHeaderFilter implements Filter {
@@ -48,9 +49,6 @@ public class AddMemberIdHeaderFilter implements Filter {
     }
 
     private boolean shouldNotFilter(String requestURI) {
-        if ("/".equals(requestURI)) {
-            return true;
-        }
         return EXCLUDED_PATHS.stream().anyMatch(requestURI::startsWith);
     }
 }
