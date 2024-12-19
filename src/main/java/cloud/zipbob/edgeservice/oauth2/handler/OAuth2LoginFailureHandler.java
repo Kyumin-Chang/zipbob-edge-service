@@ -1,20 +1,22 @@
 package cloud.zipbob.edgeservice.oauth2.handler;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import java.io.IOException;
+import java.nio.charset.StandardCharsets;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.web.authentication.AuthenticationFailureHandler;
+import org.springframework.security.web.authentication.SimpleUrlAuthenticationFailureHandler;
 import org.springframework.stereotype.Component;
-
-import java.io.IOException;
-import java.util.HashMap;
-import java.util.Map;
+import org.springframework.web.util.UriComponentsBuilder;
 
 @Slf4j
 @Component
-public class OAuth2LoginFailureHandler implements AuthenticationFailureHandler {
+public class OAuth2LoginFailureHandler extends SimpleUrlAuthenticationFailureHandler implements
+        AuthenticationFailureHandler {
+
+    private static final String FRONTEND_SERVER = "https://localhost:5173";
 
     @Override
     public void onAuthenticationFailure(final HttpServletRequest request, final HttpServletResponse response,
@@ -26,10 +28,12 @@ public class OAuth2LoginFailureHandler implements AuthenticationFailureHandler {
         log.info("User Agent: {}", request.getHeader("User-Agent"));
         log.error("Authentication failed due to: ", exception);
 
-        Map<String, String> jsonResponse = new HashMap<>();
-        jsonResponse.put("message", "소셜 로그인에 실패하였습니다.");
-        response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
-        response.setContentType("application/json");
-        new ObjectMapper().writeValue(response.getWriter(), jsonResponse);
+        String targetUrl = UriComponentsBuilder.fromUriString(FRONTEND_SERVER + "/error")
+                .queryParam("error", "failedSocialLogin")
+                .build()
+                .encode(StandardCharsets.UTF_8)
+                .toUriString();
+
+        getRedirectStrategy().sendRedirect(request, response, targetUrl);
     }
 }

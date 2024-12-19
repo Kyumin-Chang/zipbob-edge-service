@@ -4,13 +4,23 @@ import cloud.zipbob.edgeservice.auth.PrincipalDetails;
 import cloud.zipbob.edgeservice.auth.dto.TokenDto;
 import cloud.zipbob.edgeservice.auth.exception.TokenException;
 import cloud.zipbob.edgeservice.auth.exception.TokenExceptionType;
-import io.jsonwebtoken.*;
+import io.jsonwebtoken.Claims;
+import io.jsonwebtoken.ExpiredJwtException;
+import io.jsonwebtoken.Jwts;
+import io.jsonwebtoken.MalformedJwtException;
+import io.jsonwebtoken.SignatureAlgorithm;
+import io.jsonwebtoken.UnsupportedJwtException;
 import io.jsonwebtoken.io.Decoders;
 import io.jsonwebtoken.io.Encoders;
 import io.jsonwebtoken.security.Keys;
 import jakarta.annotation.PostConstruct;
+import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import java.nio.charset.StandardCharsets;
+import java.security.Key;
+import java.util.Calendar;
+import java.util.Date;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.authentication.BadCredentialsException;
@@ -18,11 +28,6 @@ import org.springframework.security.authentication.UsernamePasswordAuthenticatio
 import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Component;
 import org.springframework.util.StringUtils;
-
-import java.nio.charset.StandardCharsets;
-import java.security.Key;
-import java.util.Calendar;
-import java.util.Date;
 
 @Slf4j
 @Component
@@ -155,10 +160,6 @@ public class JwtTokenProvider {
         response.setHeader(AUTHORIZATION_HEADER, headerValue);
     }
 
-    public void refreshTokenSetHeader(String refreshToken, HttpServletResponse response) {
-        response.setHeader(REFRESH_TOKEN_HEADER, refreshToken);
-    }
-
     public String resolveAccessToken(HttpServletRequest request) {
         log.info("ResolveAccessToken execute request = {}", request.toString());
         String accessToken = request.getHeader(AUTHORIZATION_HEADER);
@@ -169,11 +170,32 @@ public class JwtTokenProvider {
     }
 
     public String resolveRefreshToken(HttpServletRequest request) {
-        log.info("ResolveRefreshToken execute, request = {}", request.toString());
-        String refreshToken = request.getHeader(REFRESH_TOKEN_HEADER);
-        if (StringUtils.hasText(refreshToken)) {
-            return refreshToken;
+        Cookie[] cookies = request.getCookies();
+        if (cookies != null) {
+            for (Cookie cookie : cookies) {
+                if ("refreshToken".equals(cookie.getName())) {
+                    return cookie.getValue();
+                }
+            }
         }
         return null;
     }
+
+    public void setTokenCookie(String tokenName, String tokenValue, HttpServletResponse response) {
+        Cookie cookie = new Cookie(tokenName, tokenValue);
+        cookie.setHttpOnly(true);
+        cookie.setSecure(true);
+        cookie.setPath("/");
+        cookie.setMaxAge(14 * 24 * 60 * 60);
+
+        response.addCookie(cookie);
+
+        String cookieHeader = String.format("%s=%s; Max-Age=%d; Path=%s; Secure; HttpOnly; SameSite=None",
+                cookie.getName(),
+                cookie.getValue(),
+                cookie.getMaxAge(),
+                cookie.getPath());
+        response.setHeader("Set-Cookie", cookieHeader);
+    }
+
 }
