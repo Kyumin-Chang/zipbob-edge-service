@@ -56,7 +56,7 @@ public class OAuth2LoginSuccessHandler extends SimpleUrlAuthenticationSuccessHan
                 .orElseThrow(() -> new MemberException(
                         MemberExceptionType.MEMBER_NOT_FOUND));
 
-        jwtTokenProvider.setTokenCookie("accessToken", "Bearer " + accessToken, response);
+        jwtTokenProvider.setTokenCookie("accessToken", accessToken, response);
         jwtTokenProvider.setTokenCookie("refreshToken", refreshToken, response);
 
         long refreshTokenExpirationPeriod = jwtTokenProperties.getRefreshExpiration();

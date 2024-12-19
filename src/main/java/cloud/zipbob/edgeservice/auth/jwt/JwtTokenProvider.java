@@ -81,8 +81,6 @@ public class JwtTokenProvider {
                 .signWith(key)
                 .compact();
 
-        log.info("accessToken: {} refreshToken: {}", accessToken, refreshToken);
-
         return TokenDto.builder()
                 .grantType(BEARER)
                 .authorizationType(AUTHORIZATION_HEADER)
@@ -195,7 +193,7 @@ public class JwtTokenProvider {
                 cookie.getValue(),
                 cookie.getMaxAge(),
                 cookie.getPath());
-        response.setHeader("Set-Cookie", cookieHeader);
+        response.addHeader("Set-Cookie", cookieHeader);
     }
 
 }
