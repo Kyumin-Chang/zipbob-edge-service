@@ -1,8 +1,5 @@
 package cloud.zipbob.edgeservice.config;
 
-import java.time.Duration;
-import java.util.HashMap;
-import java.util.Map;
 import lombok.RequiredArgsConstructor;
 import org.springframework.boot.autoconfigure.data.redis.RedisProperties;
 import org.springframework.cache.CacheManager;
@@ -17,6 +14,10 @@ import org.springframework.data.redis.repository.configuration.EnableRedisReposi
 import org.springframework.data.redis.serializer.GenericJackson2JsonRedisSerializer;
 import org.springframework.data.redis.serializer.RedisSerializationContext;
 import org.springframework.data.redis.serializer.StringRedisSerializer;
+
+import java.time.Duration;
+import java.util.HashMap;
+import java.util.Map;
 
 @Configuration
 @EnableRedisRepositories
@@ -59,5 +60,4 @@ public class RedisConfig {
                 .withInitialCacheConfigurations(cacheConfigurations)
                 .build();
     }
-
 }
