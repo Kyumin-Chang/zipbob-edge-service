@@ -16,7 +16,6 @@ import cloud.zipbob.edgeservice.domain.member.response.*;
 import cloud.zipbob.edgeservice.global.redis.RedisService;
 import cloud.zipbob.edgeservice.oauth2.SocialType;
 import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -25,8 +24,6 @@ import java.util.UUID;
 
 @Service
 @RequiredArgsConstructor
-@Slf4j
-// TODO 관리자 전용 api 제작하기 (멤버 삭제)
 public class MemberServiceImpl implements MemberService {
     private final MemberRepository memberRepository;
     private final JwtTokenProvider jwtTokenProvider;
