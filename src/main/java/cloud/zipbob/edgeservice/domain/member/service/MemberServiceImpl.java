@@ -16,7 +16,6 @@ import cloud.zipbob.edgeservice.domain.member.response.*;
 import cloud.zipbob.edgeservice.global.redis.RedisService;
 import cloud.zipbob.edgeservice.oauth2.SocialType;
 import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
 import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
@@ -27,7 +26,6 @@ import java.util.UUID;
 
 @Service
 @RequiredArgsConstructor
-@Slf4j
 public class MemberServiceImpl implements MemberService {
     private final MemberRepository memberRepository;
     private final JwtTokenProvider jwtTokenProvider;
