@@ -12,21 +12,20 @@ import cloud.zipbob.edgeservice.domain.member.repository.MemberRepository;
 import cloud.zipbob.edgeservice.domain.member.request.MemberUpdateRequest;
 import cloud.zipbob.edgeservice.domain.member.request.MemberWithdrawRequest;
 import cloud.zipbob.edgeservice.domain.member.request.OAuth2JoinRequest;
-import cloud.zipbob.edgeservice.domain.member.response.MemberUpdateResponse;
-import cloud.zipbob.edgeservice.domain.member.response.MemberWithdrawResponse;
-import cloud.zipbob.edgeservice.domain.member.response.MyInfoResponse;
-import cloud.zipbob.edgeservice.domain.member.response.OAuth2JoinResponse;
-import cloud.zipbob.edgeservice.domain.member.response.TestJoinResponse;
+import cloud.zipbob.edgeservice.domain.member.response.*;
 import cloud.zipbob.edgeservice.global.redis.RedisService;
 import cloud.zipbob.edgeservice.oauth2.SocialType;
-import java.time.Duration;
-import java.util.UUID;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.Duration;
+import java.util.UUID;
+
 @Service
 @RequiredArgsConstructor
+@Slf4j
 // TODO 관리자 전용 api 제작하기 (멤버 삭제)
 public class MemberServiceImpl implements MemberService {
     private final MemberRepository memberRepository;
