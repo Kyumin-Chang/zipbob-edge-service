@@ -47,7 +47,7 @@ public class MemberController {
     public ResponseEntity<OAuth2JoinResponse> join(@AuthenticationPrincipal PrincipalDetails user,
                                                    @RequestBody final OAuth2JoinRequest request) {
         OAuth2JoinResponse response = memberService.oauth2Join(request, user.getUsername());
-        emailService.sendEmailRequest(user.getUsername(), request.nickname(), "welcome");
+//        emailService.sendEmailRequest(user.getUsername(), request.nickname(), "welcome");
         return Responder.success(response);
     }
 

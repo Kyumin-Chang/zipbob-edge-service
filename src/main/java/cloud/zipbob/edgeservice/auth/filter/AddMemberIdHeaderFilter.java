@@ -17,7 +17,7 @@ import org.springframework.security.core.context.SecurityContextHolder;
 public class AddMemberIdHeaderFilter implements Filter {
 
     private static final List<String> EXCLUDED_PATHS = List.of("/auth/reissue", "/members/nickname-check",
-            "/members/test/join");
+            "/members/test/join", "/bus/refresh");
 
     @Override
     public void doFilter(jakarta.servlet.ServletRequest request,
@@ -48,9 +48,6 @@ public class AddMemberIdHeaderFilter implements Filter {
     }
 
     private boolean shouldNotFilter(String requestURI) {
-        if ("/".equals(requestURI)) {
-            return true;
-        }
         return EXCLUDED_PATHS.stream().anyMatch(requestURI::startsWith);
     }
 }

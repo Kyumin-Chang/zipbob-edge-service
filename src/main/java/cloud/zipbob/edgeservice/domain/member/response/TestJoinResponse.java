@@ -12,13 +12,14 @@ import lombok.Getter;
 public class TestJoinResponse {
     private Long id;
     private String email;
+    private String nickname;
     private Role role;
     private SocialType socialType;
     private String accessToken;
     private String refreshToken;
 
     public static TestJoinResponse of(Member member, String accessToken, String refreshToken) {
-        return new TestJoinResponse(member.getId(), member.getEmail(), member.getRole(),
+        return new TestJoinResponse(member.getId(), member.getEmail(), member.getNickname(), member.getRole(),
                 member.getSocialType(), accessToken, refreshToken);
     }
 }

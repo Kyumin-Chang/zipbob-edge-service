@@ -48,13 +48,12 @@ public class SecurityConfig {
                 .exceptionHandling(exception -> exception
                         .accessDeniedHandler(customAccessDeniedHandler))
                 .authorizeHttpRequests(authorizeRequests -> authorizeRequests
-                        .requestMatchers("/", "/auth/reissue",
-                                "members/nickname-check/**", "/actuator/**", "/members/test/join")
+                        .requestMatchers("/auth/reissue",
+                                "members/nickname-check/**", "/actuator/**", "/members/test/join", "/bus-refresh")
                         .permitAll()
                         .anyRequest().authenticated())
                 .oauth2Login((oauth2Login) ->
                         oauth2Login
-                                .loginPage("/")
                                 .userInfoEndpoint(userInfoEndpointConfig -> userInfoEndpointConfig.userService(
                                         customOAuth2MemberService))
                                 .successHandler(oAuth2LoginSuccessHandler)

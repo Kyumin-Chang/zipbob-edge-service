@@ -10,29 +10,31 @@ import cloud.zipbob.edgeservice.domain.member.exception.MemberException;
 import cloud.zipbob.edgeservice.domain.member.exception.MemberExceptionType;
 import cloud.zipbob.edgeservice.domain.member.repository.MemberRepository;
 import cloud.zipbob.edgeservice.global.redis.RedisService;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import java.io.IOException;
+import java.nio.charset.StandardCharsets;
+import java.time.Duration;
+import java.util.Objects;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.web.authentication.AuthenticationSuccessHandler;
+import org.springframework.security.web.authentication.SimpleUrlAuthenticationSuccessHandler;
 import org.springframework.stereotype.Component;
-
-import java.io.IOException;
-import java.time.Duration;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Objects;
+import org.springframework.web.util.UriComponentsBuilder;
 
 @Slf4j
 @Component
 @RequiredArgsConstructor
-public class OAuth2LoginSuccessHandler implements AuthenticationSuccessHandler {
+public class OAuth2LoginSuccessHandler extends SimpleUrlAuthenticationSuccessHandler implements
+        AuthenticationSuccessHandler {
     private final JwtTokenProvider jwtTokenProvider;
     private final JwtTokenProperties jwtTokenProperties;
     private final MemberRepository memberRepository;
     private final RedisService redisService;
+
+    private static final String FRONTEND_SERVER = "https://localhost:5173";
 
     @Override
     public void onAuthenticationSuccess(HttpServletRequest request, HttpServletResponse response,
@@ -41,10 +43,10 @@ public class OAuth2LoginSuccessHandler implements AuthenticationSuccessHandler {
         PrincipalDetails principalDetails = (PrincipalDetails) authentication.getPrincipal();
         String role = principalDetails.role();
 
-        handleLogin(role, response, principalDetails);
+        handleLogin(role, request, response, principalDetails);
     }
 
-    private void handleLogin(String role, HttpServletResponse response,
+    private void handleLogin(String role, HttpServletRequest request, HttpServletResponse response,
                              PrincipalDetails principalDetails) throws IOException {
         TokenDto tokenDto = jwtTokenProvider.generateTokenDto(principalDetails);
         String accessToken = tokenDto.getAccessToken();
@@ -54,22 +56,33 @@ public class OAuth2LoginSuccessHandler implements AuthenticationSuccessHandler {
                 .orElseThrow(() -> new MemberException(
                         MemberExceptionType.MEMBER_NOT_FOUND));
 
-        jwtTokenProvider.accessTokenSetHeader(accessToken, response);
-        jwtTokenProvider.refreshTokenSetHeader(refreshToken, response);
+        jwtTokenProvider.setTokenCookie("accessToken", accessToken, response);
+        jwtTokenProvider.setTokenCookie("refreshToken", refreshToken, response);
 
         long refreshTokenExpirationPeriod = jwtTokenProperties.getRefreshExpiration();
         redisService.setValues(member.getEmail(), refreshToken, Duration.ofMillis(refreshTokenExpirationPeriod));
 
-        Map<String, String> jsonResponse = new HashMap<>();
+        String targetUrl;
         if (Objects.equals(role, Role.GUEST.getKey())) {
-            jsonResponse.put("message", "New Member OAuth Login Success");
-            jsonResponse.put("email", member.getEmail());
+            log.info("OAuth Guest login successful");
+            targetUrl = UriComponentsBuilder.fromUriString(FRONTEND_SERVER + "/test")
+                    .queryParam("id", member.getId())
+                    .queryParam("email", member.getEmail())
+                    .build()
+                    .encode(StandardCharsets.UTF_8)
+                    .toUriString();
+        } else if (Objects.equals(role, Role.USER.getKey())) {
+            log.info("OAuth User login successful");
+            targetUrl = UriComponentsBuilder.fromUriString(FRONTEND_SERVER + "/home")
+                    .queryParam("memberId", member.getId())
+                    .queryParam("email", member.getEmail())
+                    .queryParam("nickname", member.getNickname())
+                    .build()
+                    .encode(StandardCharsets.UTF_8)
+                    .toUriString();
         } else {
-            jsonResponse.put("message", "Existing Member OAuth Login Success");
-            jsonResponse.put("email", member.getEmail());
+            throw new MemberException(MemberExceptionType.WRONG_ROLE);
         }
-        response.setContentType("application/json;charset=UTF-8");
-        response.setStatus(HttpServletResponse.SC_OK);
-        new ObjectMapper().writeValue(response.getWriter(), jsonResponse);
+        getRedirectStrategy().sendRedirect(request, response, targetUrl);
     }
 }
