@@ -184,7 +184,7 @@ public class JwtTokenProvider {
 
         response.addCookie(cookie);
 
-        String cookieHeader = String.format("%s=%s; Max-Age=%d; Path=%s; HttpOnly; SameSite=Lax",
+        String cookieHeader = String.format("%s=%s; Max-Age=%d; Path=%s; HttpOnly; SameSite=None",
                 cookie.getName(),
                 cookie.getValue(),
                 cookie.getMaxAge(),
