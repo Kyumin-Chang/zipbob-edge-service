@@ -12,10 +12,6 @@ import cloud.zipbob.edgeservice.domain.member.repository.MemberRepository;
 import cloud.zipbob.edgeservice.global.redis.RedisService;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
-import java.io.IOException;
-import java.nio.charset.StandardCharsets;
-import java.time.Duration;
-import java.util.Objects;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.core.Authentication;
@@ -23,6 +19,11 @@ import org.springframework.security.web.authentication.AuthenticationSuccessHand
 import org.springframework.security.web.authentication.SimpleUrlAuthenticationSuccessHandler;
 import org.springframework.stereotype.Component;
 import org.springframework.web.util.UriComponentsBuilder;
+
+import java.io.IOException;
+import java.nio.charset.StandardCharsets;
+import java.time.Duration;
+import java.util.Objects;
 
 @Slf4j
 @Component
@@ -34,7 +35,7 @@ public class OAuth2LoginSuccessHandler extends SimpleUrlAuthenticationSuccessHan
     private final MemberRepository memberRepository;
     private final RedisService redisService;
 
-    private static final String FRONTEND_SERVER = "https://localhost:5173";
+    private static final String FRONTEND_SERVER = "http://localhost:5173";
 
     @Override
     public void onAuthenticationSuccess(HttpServletRequest request, HttpServletResponse response,
@@ -65,7 +66,7 @@ public class OAuth2LoginSuccessHandler extends SimpleUrlAuthenticationSuccessHan
         String targetUrl;
         if (Objects.equals(role, Role.GUEST.getKey())) {
             log.info("OAuth Guest login successful");
-            targetUrl = UriComponentsBuilder.fromUriString(FRONTEND_SERVER + "/test")
+            targetUrl = UriComponentsBuilder.fromUriString(FRONTEND_SERVER + "/signup")
                     .queryParam("id", member.getId())
                     .queryParam("email", member.getEmail())
                     .build()

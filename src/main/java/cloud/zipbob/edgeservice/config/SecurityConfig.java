@@ -7,8 +7,6 @@ import cloud.zipbob.edgeservice.global.redis.RedisService;
 import cloud.zipbob.edgeservice.oauth2.CustomOAuth2MemberService;
 import cloud.zipbob.edgeservice.oauth2.handler.OAuth2LoginFailureHandler;
 import cloud.zipbob.edgeservice.oauth2.handler.OAuth2LoginSuccessHandler;
-import java.util.Arrays;
-import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -23,6 +21,9 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.CorsConfigurationSource;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
+
+import java.util.Arrays;
+import java.util.List;
 
 @Configuration
 @EnableWebSecurity
@@ -49,7 +50,7 @@ public class SecurityConfig {
                         .accessDeniedHandler(customAccessDeniedHandler))
                 .authorizeHttpRequests(authorizeRequests -> authorizeRequests
                         .requestMatchers("/auth/reissue",
-                                "members/nickname-check/**", "/actuator/**", "/members/test/join", "/bus-refresh")
+                                "members/nickname-check/**", "/actuator/**", "/members/test/join")
                         .permitAll()
                         .anyRequest().authenticated())
                 .oauth2Login((oauth2Login) ->
