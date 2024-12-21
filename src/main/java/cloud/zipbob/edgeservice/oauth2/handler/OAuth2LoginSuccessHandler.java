@@ -35,7 +35,7 @@ public class OAuth2LoginSuccessHandler extends SimpleUrlAuthenticationSuccessHan
     private final MemberRepository memberRepository;
     private final RedisService redisService;
 
-    private static final String FRONTEND_SERVER = "http://localhost:5173";
+    private static final String FRONTEND_SERVER = "https://localhost:5173";
 
     @Override
     public void onAuthenticationSuccess(HttpServletRequest request, HttpServletResponse response,
