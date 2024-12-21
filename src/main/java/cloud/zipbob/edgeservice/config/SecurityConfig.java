@@ -77,6 +77,7 @@ public class SecurityConfig {
         configuration.setAllowCredentials(true);
         configuration.addExposedHeader("Authorization");
         configuration.addExposedHeader("Refresh");
+        configuration.addExposedHeader("Set-Cookie");
         configuration.addAllowedHeader("*");
         configuration.setMaxAge(3600L);
 
