@@ -6,10 +6,12 @@ import cloud.zipbob.edgeservice.oauth2.SocialType;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 
+import java.io.Serializable;
+
 //TODO test 후 배포할 때 제거 필수
 @Getter
 @AllArgsConstructor
-public class TestJoinResponse {
+public class TestJoinResponse implements Serializable {
     private Long id;
     private String email;
     private String nickname;
