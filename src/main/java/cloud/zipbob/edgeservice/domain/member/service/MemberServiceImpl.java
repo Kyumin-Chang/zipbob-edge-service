@@ -88,6 +88,7 @@ public class MemberServiceImpl implements MemberService {
 
     //TODO test 후 배포할 때 제거 필수
     @Override
+    @Cacheable(value = "memberInfoCache", key = "#root.args[0] != null ? #root.args[0] : 'defaultKey'")
     public TestJoinResponse testJoin(String email) {
         if (memberRepository.findByEmail(email).isPresent()) {
             throw new MemberException(MemberExceptionType.ALREADY_EXIST_EMAIL);
