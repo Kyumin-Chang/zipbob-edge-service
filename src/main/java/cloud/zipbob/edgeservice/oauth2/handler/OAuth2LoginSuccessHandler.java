@@ -69,6 +69,8 @@ public class OAuth2LoginSuccessHandler extends SimpleUrlAuthenticationSuccessHan
             targetUrl = UriComponentsBuilder.fromUriString(FRONTEND_SERVER + "/signup")
                     .queryParam("id", member.getId())
                     .queryParam("email", member.getEmail())
+                    .queryParam("access_token", accessToken)
+                    .queryParam("refresh_token", refreshToken)
                     .build()
                     .encode(StandardCharsets.UTF_8)
                     .toUriString();
@@ -78,6 +80,8 @@ public class OAuth2LoginSuccessHandler extends SimpleUrlAuthenticationSuccessHan
                     .queryParam("memberId", member.getId())
                     .queryParam("email", member.getEmail())
                     .queryParam("nickname", member.getNickname())
+                    .queryParam("accessToken", accessToken)
+                    .queryParam("refreshToken", refreshToken)
                     .build()
                     .encode(StandardCharsets.UTF_8)
                     .toUriString();
