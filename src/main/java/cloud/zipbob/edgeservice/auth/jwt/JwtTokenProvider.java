@@ -178,13 +178,13 @@ public class JwtTokenProvider {
     public void setTokenCookie(String tokenName, String tokenValue, HttpServletResponse response) {
         Cookie cookie = new Cookie(tokenName, tokenValue);
         cookie.setHttpOnly(true);
-        cookie.setSecure(false);
+        cookie.setSecure(true);
         cookie.setPath("/");
         cookie.setMaxAge(14 * 24 * 60 * 60);
 
         response.addCookie(cookie);
 
-        String cookieHeader = String.format("%s=%s; Max-Age=%d; Path=%s; HttpOnly; SameSite=None",
+        String cookieHeader = String.format("%s=%s; Max-Age=%d; Path=%s; Secure; HttpOnly; SameSite=None",
                 cookie.getName(),
                 cookie.getValue(),
                 cookie.getMaxAge(),
