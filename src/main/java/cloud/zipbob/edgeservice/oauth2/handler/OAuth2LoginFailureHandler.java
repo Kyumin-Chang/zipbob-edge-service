@@ -17,7 +17,7 @@ import java.nio.charset.StandardCharsets;
 public class OAuth2LoginFailureHandler extends SimpleUrlAuthenticationFailureHandler implements
         AuthenticationFailureHandler {
 
-    private static final String FRONTEND_SERVER = "https://zipbob.site";
+    private static final String FRONTEND_SERVER = "https://www.zipbob.site";
 
     @Override
     public void onAuthenticationFailure(final HttpServletRequest request, final HttpServletResponse response,

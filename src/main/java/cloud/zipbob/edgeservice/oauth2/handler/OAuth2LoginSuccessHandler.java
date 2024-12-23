@@ -35,7 +35,7 @@ public class OAuth2LoginSuccessHandler extends SimpleUrlAuthenticationSuccessHan
     private final MemberRepository memberRepository;
     private final RedisService redisService;
 
-    private static final String FRONTEND_SERVER = "https://zipbob.site";
+    private static final String FRONTEND_SERVER = "https://www.zipbob.site";
 
     @Override
     public void onAuthenticationSuccess(HttpServletRequest request, HttpServletResponse response,
