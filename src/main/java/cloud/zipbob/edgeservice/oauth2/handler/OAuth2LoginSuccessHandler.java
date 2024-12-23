@@ -35,7 +35,7 @@ public class OAuth2LoginSuccessHandler extends SimpleUrlAuthenticationSuccessHan
     private final MemberRepository memberRepository;
     private final RedisService redisService;
 
-    private static final String FRONTEND_SERVER = "https://localhost:5173";
+    private static final String FRONTEND_SERVER = "https://zipbob.site";
 
     @Override
     public void onAuthenticationSuccess(HttpServletRequest request, HttpServletResponse response,
@@ -80,8 +80,8 @@ public class OAuth2LoginSuccessHandler extends SimpleUrlAuthenticationSuccessHan
                     .queryParam("memberId", member.getId())
                     .queryParam("email", member.getEmail())
                     .queryParam("nickname", member.getNickname())
-                    .queryParam("accessToken", accessToken)
-                    .queryParam("refreshToken", refreshToken)
+                    .queryParam("access_token", accessToken)
+                    .queryParam("refresh_token", refreshToken)
                     .build()
                     .encode(StandardCharsets.UTF_8)
                     .toUriString();
