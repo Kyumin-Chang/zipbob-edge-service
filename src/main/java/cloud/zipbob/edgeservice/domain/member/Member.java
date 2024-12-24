@@ -45,10 +45,6 @@ public class Member {
         this.role = Role.USER;
     }
 
-    public void authorizeAdmin() {
-        this.role = Role.ADMIN;
-    }
-
     public void updateNickname(String nickname) {
         this.nickname = nickname;
     }

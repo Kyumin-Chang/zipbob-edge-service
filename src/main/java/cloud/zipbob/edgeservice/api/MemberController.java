@@ -4,8 +4,10 @@ import cloud.zipbob.edgeservice.auth.PrincipalDetails;
 import cloud.zipbob.edgeservice.domain.member.request.MemberUpdateRequest;
 import cloud.zipbob.edgeservice.domain.member.request.MemberWithdrawRequest;
 import cloud.zipbob.edgeservice.domain.member.request.OAuth2JoinRequest;
-import cloud.zipbob.edgeservice.domain.member.request.TestJoinRequest;
-import cloud.zipbob.edgeservice.domain.member.response.*;
+import cloud.zipbob.edgeservice.domain.member.response.MemberUpdateResponse;
+import cloud.zipbob.edgeservice.domain.member.response.MemberWithdrawResponse;
+import cloud.zipbob.edgeservice.domain.member.response.MyInfoResponse;
+import cloud.zipbob.edgeservice.domain.member.response.OAuth2JoinResponse;
 import cloud.zipbob.edgeservice.domain.member.service.MemberService;
 import cloud.zipbob.edgeservice.global.Responder;
 import cloud.zipbob.edgeservice.global.email.EmailService;
@@ -36,7 +38,7 @@ public class MemberController {
     public ResponseEntity<OAuth2JoinResponse> join(@AuthenticationPrincipal PrincipalDetails user,
                                                    @RequestBody final OAuth2JoinRequest request) {
         OAuth2JoinResponse response = memberService.oauth2Join(request, user.getUsername());
-//        emailService.sendEmailRequest(user.getUsername(), request.nickname(), "welcome");
+        emailService.sendEmailRequest(user.getUsername(), request.nickname(), "welcome");
         return Responder.success(response);
     }
 
@@ -45,7 +47,7 @@ public class MemberController {
     public ResponseEntity<MemberWithdrawResponse> withdraw(@AuthenticationPrincipal PrincipalDetails user,
                                                            @RequestBody final MemberWithdrawRequest request) {
         MemberWithdrawResponse response = memberService.withdraw(request, user.getUsername());
-//        emailService.sendEmailRequest(user.getUsername(), request.nickname(), "goodbye");
+        emailService.sendEmailRequest(user.getUsername(), request.nickname(), "goodbye");
         return Responder.success(response);
     }
 
@@ -61,12 +63,4 @@ public class MemberController {
         boolean result = memberService.checkNickname(nickname);
         return Responder.success(result);
     }
-
-    //TODO test 후 배포할 때 제거 필수 (url 필터 제외도 제거)
-    @PostMapping("/test/join")
-    public ResponseEntity<TestJoinResponse> testJoin(@RequestBody final TestJoinRequest request) {
-        TestJoinResponse response = memberService.testJoin(request.email());
-        return Responder.success(response);
-    }
-
 }

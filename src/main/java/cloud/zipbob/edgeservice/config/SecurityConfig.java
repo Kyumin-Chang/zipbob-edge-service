@@ -4,6 +4,7 @@ import cloud.zipbob.edgeservice.auth.filter.JwtVerificationFilter;
 import cloud.zipbob.edgeservice.auth.jwt.JwtTokenProvider;
 import cloud.zipbob.edgeservice.global.CustomAccessDeniedHandler;
 import cloud.zipbob.edgeservice.global.redis.RedisService;
+import cloud.zipbob.edgeservice.oauth2.CustomOAuth2AuthorizationRequestRepository;
 import cloud.zipbob.edgeservice.oauth2.CustomOAuth2MemberService;
 import cloud.zipbob.edgeservice.oauth2.handler.OAuth2LoginFailureHandler;
 import cloud.zipbob.edgeservice.oauth2.handler.OAuth2LoginSuccessHandler;
@@ -16,6 +17,8 @@ import org.springframework.security.config.annotation.web.configuration.EnableWe
 import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
 import org.springframework.security.config.annotation.web.configurers.HeadersConfigurer;
 import org.springframework.security.config.http.SessionCreationPolicy;
+import org.springframework.security.oauth2.client.web.AuthorizationRequestRepository;
+import org.springframework.security.oauth2.core.endpoint.OAuth2AuthorizationRequest;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 import org.springframework.web.cors.CorsConfiguration;
@@ -38,7 +41,7 @@ public class SecurityConfig {
     private final RedisService redisService;
 
     @Bean
-    public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
+    public SecurityFilterChain filterChain(HttpSecurity http, CustomOAuth2AuthorizationRequestRepository customOAuth2AuthorizationRequestRepository) throws Exception {
         http
                 .csrf(AbstractHttpConfigurer::disable)
                 .cors(corsCustomizer -> corsCustomizer.configurationSource(corsConfigurationSource()))
@@ -50,13 +53,15 @@ public class SecurityConfig {
                         .accessDeniedHandler(customAccessDeniedHandler))
                 .authorizeHttpRequests(authorizeRequests -> authorizeRequests
                         .requestMatchers("/auth/reissue",
-                                "/members/nickname-check/**", "/actuator/**", "/members/test/join")
+                                "/members/nickname-check/**", "/actuator/**")
                         .permitAll()
                         .anyRequest().authenticated())
                 .oauth2Login((oauth2Login) ->
                         oauth2Login
                                 .userInfoEndpoint(userInfoEndpointConfig -> userInfoEndpointConfig.userService(
                                         customOAuth2MemberService))
+                                .authorizationEndpoint(authorization -> authorization
+                                        .authorizationRequestRepository(customOAuth2AuthorizationRequestRepository))
                                 .successHandler(oAuth2LoginSuccessHandler)
                                 .failureHandler(oAuth2LoginFailureHandler)
                 )
@@ -84,5 +89,10 @@ public class SecurityConfig {
         UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
         source.registerCorsConfiguration("/**", configuration);
         return source;
+    }
+
+    @Bean
+    public AuthorizationRequestRepository<OAuth2AuthorizationRequest> authorizationRequestRepository() {
+        return new CustomOAuth2AuthorizationRequestRepository();
     }
 }

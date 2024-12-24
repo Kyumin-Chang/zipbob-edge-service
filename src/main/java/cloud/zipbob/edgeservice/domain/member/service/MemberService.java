@@ -7,7 +7,6 @@ import cloud.zipbob.edgeservice.domain.member.response.MemberUpdateResponse;
 import cloud.zipbob.edgeservice.domain.member.response.MemberWithdrawResponse;
 import cloud.zipbob.edgeservice.domain.member.response.MyInfoResponse;
 import cloud.zipbob.edgeservice.domain.member.response.OAuth2JoinResponse;
-import cloud.zipbob.edgeservice.domain.member.response.TestJoinResponse;
 
 public interface MemberService {
     MemberUpdateResponse update(MemberUpdateRequest request, String email);
@@ -19,7 +18,4 @@ public interface MemberService {
     MyInfoResponse getMyInfo(String email);
 
     boolean checkNickname(String nickname);
-
-    //TODO test 후 배포할 때 제거 필수
-    TestJoinResponse testJoin(String email);
 }

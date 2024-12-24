@@ -50,7 +50,6 @@ public class AuthService {
         String redisRefreshToken = redisService.getValues(email);
         if (redisService.checkExistsValue(redisRefreshToken)) {
             redisService.deleteValues(email);
-            // 로그아웃 시 Access Token Redis 저장 ( key = Access Token / value = "logout" ) 로그아웃 후 해당 액세스 토큰 사용 불가
             long accessTokenExpirationMillis = jwtTokenProperties.getAccessExpiration();
             redisService.setValues(accessToken, "logout", Duration.ofMillis(accessTokenExpirationMillis));
         } else {

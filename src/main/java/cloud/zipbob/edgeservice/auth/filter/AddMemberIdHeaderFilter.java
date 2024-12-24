@@ -7,17 +7,17 @@ import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
-import java.io.IOException;
-import java.util.List;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 
+import java.io.IOException;
+import java.util.List;
+
 @Slf4j
 public class AddMemberIdHeaderFilter implements Filter {
 
-    private static final List<String> EXCLUDED_PATHS = List.of("/auth/reissue", "/members/nickname-check",
-            "/members/test/join", "/bus/refresh");
+    private static final List<String> EXCLUDED_PATHS = List.of("/auth/reissue", "/members/nickname-check", "/bus/refresh");
 
     @Override
     public void doFilter(jakarta.servlet.ServletRequest request,

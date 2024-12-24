@@ -32,7 +32,6 @@ public class JwtTokenProvider {
     private final JwtTokenProperties jwtTokenProperties;
     private static final String BEARER = "Bearer";
     private static final String AUTHORIZATION_HEADER = "Authorization";
-    private static final String REFRESH_TOKEN_HEADER = "Refresh";
     private static final String BEARER_PREFIX = "Bearer ";
 
     private Key key;

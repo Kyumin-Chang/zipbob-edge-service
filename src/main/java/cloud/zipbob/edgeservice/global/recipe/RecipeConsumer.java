@@ -15,7 +15,6 @@ public class RecipeConsumer {
 
     private final BlockingQueue<String> recipeQueue = new LinkedBlockingQueue<>();
 
-    //TODO 큐 이름 수정
     @RabbitListener(queues = "response.queue")
     public void receiveRecipe(String recipe) {
         log.info("레시피를 받았습니다.");
