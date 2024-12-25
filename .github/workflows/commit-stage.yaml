@@ -98,7 +98,7 @@ jobs:
           cd zipbob-deployment
           
           # 이미지 태그 업데이트
-          sed -i "s|image: ghcr.io/kakao-tech-bootcamp-team2/recipe-review-service.*|image: ghcr.io/kakao-tech-bootcamp-team2/recipe-review-service:${{ env.VERSION }}|" k8s/applications/production/edge-service.yaml
+          sed -i "s|image: ghcr.io/kakao-tech-bootcamp-team2/zipbob-edge-service.*|image: ghcr.io/kakao-tech-bootcamp-team2/zipbob-edge-service:${{ env.VERSION }}|" k8s/applications/production/edge-service.yaml
           
           # 변경사항 커밋 & 푸시
           git config --global user.name 'github-actions[bot]'
