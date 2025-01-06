@@ -5,6 +5,7 @@ env:
   REGISTRY: ghcr.io
   IMAGE_NAME: kakao-tech-bootcamp-team2/zipbob-edge-service
   VERSION: ${{ github.sha }}  # 커밋 해시를 버전으로 사용
+
 jobs:
   build:
     name: Build and Test
@@ -16,7 +17,7 @@ jobs:
       - name: Checkout source code
         uses: actions/checkout@v3
       - name: Set up JDK
-        uses: actions/setup-java@v2
+        uses: actions/setup-java@v3
         with:
           distribution: temurin
           java-version: 17
@@ -38,71 +39,3 @@ jobs:
         if: success() || failure()
         with:
           sarif_file: ${{ steps.scan.outputs.sarif }}
-  #      - name: Setup tools # 쿠버네티스 매니페스트 파일 검증을 위한 사전작업
-  #        uses: alexellis/setup-arkade@v3
-  #      - name: Install tools
-  #        uses: alexellis/arkade-get@master # Arkade를 사용하여 지정된 도구를 설치
-  #        with:
-  #          kubeconform: latest # kubeconform은 k8s 매니페스트 유효성을 검사하는 도구
-  #      - name: Validate Kubernetes manifests
-  #        run: |
-  #          kubeconform --strict k8s
-  package:
-    name: Package and Publish
-    if: ${{ github.ref == 'refs/heads/main' }}
-    needs: [ build ]
-    runs-on: ubuntu-24.04
-    permissions:
-      contents: read
-      packages: write
-      security-events: write
-    steps:
-      - name: Checkout source code
-        uses: actions/checkout@v4
-      - name: Set up JDK
-        uses: actions/setup-java@v4
-        with:
-          distribution: temurin
-          java-version: 17
-          cache: gradle
-      - name: Build container image
-        run: |
-          chmod +x gradlew
-          ./gradlew bootBuildImage \
-            --imageName ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:${{ env.VERSION }}
-      - name: OCI image vulnerability scanning
-        uses: anchore/scan-action@v3
-        id: scan
-        with:
-          image: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:${{ env.VERSION }}
-          fail-build: false
-          severity-cutoff: high
-      - name: Upload vulnerability report
-        uses: github/codeql-action/upload-sarif@v3
-        if: success() || failure()
-        with:
-          sarif_file: ${{ steps.scan.outputs.sarif }}
-      - name: Log into container registry
-        uses: docker/login-action@v3
-        with:
-          registry: ${{ env.REGISTRY }}
-          username: ${{ github.actor }}
-          password: ${{ secrets.GITHUB_TOKEN }}
-      - name: Publish container image
-        run: docker push ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:${{ env.VERSION }}
-      # 새로운 버전 생성 후 매니페스트 업데이트
-      - name: Update Kubernetes manifests
-        run: |
-          # 매니페스트 레포 클론
-          git clone https://x-access-token:${{ secrets.PAT_TOKEN }}@github.com/Kakao-Tech-Bootcamp-Team2/zipbob-deployment.git
-          cd zipbob-deployment
-          
-          # 이미지 태그 업데이트
-          sed -i "s|image: ghcr.io/kakao-tech-bootcamp-team2/zipbob-edge-service.*|image: ghcr.io/kakao-tech-bootcamp-team2/zipbob-edge-service:${{ env.VERSION }}|" k8s/applications/production/edge-service.yaml
-          
-          # 변경사항 커밋 & 푸시
-          git config --global user.name 'github-actions[bot]'
-          git config --global user.email 'github-actions[bot]@users.noreply.github.com'
-          git add .
-          git commit -m "Update recipe-review-service to version ${{ env.VERSION }}"
-          git push
