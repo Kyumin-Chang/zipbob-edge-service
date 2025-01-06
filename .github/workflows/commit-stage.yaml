@@ -4,7 +4,7 @@ on: push
 env:
   REGISTRY: ghcr.io
   IMAGE_NAME: kakao-tech-bootcamp-team2/zipbob-edge-service
-  VERSION: ${{ github.sha }}  # 커밋 해시를 버전으로 사용
+  VERSION: ${{ github.sha }}
 
 jobs:
   build:
